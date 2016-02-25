@@ -547,3 +547,77 @@ function backward_msg_format (msg)
   end
   return msg
 end
+
+function is_admin(user_id)
+  for v,user in pairs(_config.admin_users) do
+    print(user[1])
+    if user[1] == user_id then
+        return true
+    end
+  end
+  return false
+end
+
+function is_id(name_id)
+	local var = tonumber(name_id)
+	if var then
+		return true
+	else
+		return false
+	end
+end
+
+function lang_text(chat_id, keyword)
+    local hash = 'langset:'..chat_id
+    local lang = redis:get(hash)
+    if not lang then
+        redis:set(hash,'en')
+        lang = redis:get(hash)
+    end
+    local hashtext = 'lang:'..lang..':'..keyword
+    if redis:get(hashtext) then
+        return redis:get(hashtext)
+    else
+        return 'Please, install your selected "'..lang..'" language by #install [archive_name(english_lang, spanish_lang...)]. First, active your language package like a normal plugin by it\'s name. For example, #plugins enable english_lang. Or set another one by typing #lang [language(en, es...)].'
+    end
+    
+end
+
+function set_text(lang, keyword, text)
+    local hash = 'lang:'..lang..':'..keyword
+    redis:set(hash, text)
+end
+
+function is_mod(chat_id, user_id)
+    local hash = 'mod:'..chat_id..':'..user_id
+    if redis:get(hash) then
+        return true
+    else
+        return false
+    end
+end
+
+function is_gbanned_table(user_id)
+  for v,user in pairs(_gbans.gbans_users) do
+    if tonumber(user) == tonumber(user_id) then
+        return true
+    end
+  end
+  return false
+end
+
+function gban_id(user_id)
+  local hash = 'gban:'..user_id
+  redis:set(hash, true)
+end
+
+function new_is_sudo(user_id)
+  local var = false
+  -- Check users id in config
+  for v,user in pairs(_config.sudo_users) do
+    if user == user_id then
+      var = true
+    end
+  end
+  return var
+end
