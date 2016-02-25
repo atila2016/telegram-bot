@@ -578,7 +578,7 @@ function lang_text(chat_id, keyword)
     if redis:get(hashtext) then
         return redis:get(hashtext)
     else
-        return 'Please, install your selected "'..lang..'" language by #install [archive_name(english_lang, spanish_lang...)]. First, active your language package like a normal plugin by it\'s name. For example, #plugins enable english_lang. Or set another one by typing #lang [language(en, es...)].'
+        return 'Text not found in your DB.\n'
     end
     
 end
@@ -609,6 +609,12 @@ end
 function gban_id(user_id)
   local hash = 'gban:'..user_id
   redis:set(hash, true)
+
+  if not is_gbanned_table(user_id) then
+    table.insert(_gbans.gbans_users, tonumber(user_id))
+    print(user_id..' added to _gbans table')
+    save_gbans()
+  end
 end
 
 function new_is_sudo(user_id)
