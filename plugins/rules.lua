@@ -7,21 +7,25 @@
 --------------------------------------------------
 --                                              --
 --       Developers: @Josepdal & @MaSkAoS       --
---         Support: @Skneos & @Thef7HD          --
+--          Support: @Skneos &  @iicc1          --
 --                                              --
 --------------------------------------------------
 
 do
 
 function run(msg, matches)
-  return 'DBTeam Bot V1 Supergroups\nAn advanced Administration bot based on yagop/telegram-bot \n\nhttp://github.com/DBTeam-ES/DBTeam-Bot\n\nDevelopers :\n@MaSkAoS\n@Josepdal\n\nSupport :\n@skneos\n@Thef7HD' 
-  --[[ Checkout http://github.com/Desarrollo-Bots-Telegram-ES/DBTeam-Bot
-  --GNU GPL v2 license.]]
+  return [[
+ℹ️ Rules:
+1⃣ No Flood.
+2⃣ No Spam.
+3⃣ Try to stay on topic.
+4⃣ Forbidden any racist, sexual, homophobic or gore content.
+➡️ Repeated failure to comply with these rules will cause ban.]]
 end
 
 return {
   patterns = {
-    "^#version$"
+    "^#rules$"
   }, 
   run = run 
 }
