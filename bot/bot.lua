@@ -3,6 +3,8 @@ package.path = package.path .. ';.luarocks/share/lua/5.2/?.lua'
 package.cpath = package.cpath .. ';.luarocks/lib/lua/5.2/?.so'
 
 require("./bot/utils")
+require("./bot/permissions")
+--require("./bot/usages")
 
 local f = assert(io.popen('/usr/bin/git describe --tags', 'r'))
 VERSION = assert(f:read('*a'))
@@ -24,7 +26,7 @@ function on_msg_receive (msg)
     msg = pre_process_msg(msg)
     if msg then
       match_plugins(msg)
-      mark_read(receiver, ok_cb, false)
+      --mark_read(receiver, ok_cb, false)
     end
   end
 end
@@ -39,6 +41,8 @@ function on_binlog_replay_end()
 
   _config = load_config()
 
+  _gbans = load_gbans()
+
   -- load plugins
   plugins = {}
   load_plugins()
@@ -48,7 +52,7 @@ function msg_valid(msg)
   -- Don't process outgoing messages
   if msg.out then
     print('\27[36mNot valid: msg from us\27[39m')
-    return false
+    return true
   end
 
   -- Before bot was started
@@ -74,7 +78,7 @@ function msg_valid(msg)
 
   if msg.from.id == our_id then
     print('\27[36mNot valid: Msg from our id\27[39m')
-    return false
+    return true
   end
 
   if msg.to.type == 'encr_chat' then
@@ -184,6 +188,11 @@ function save_config( )
   print ('saved config into ./data/config.lua')
 end
 
+function save_gbans( )
+  serialize_to_file(_gbans, './data/gbans.lua')
+  print ('saved gban into ./data/gbans.lua')
+end
+
 -- Returns the config from config.lua file.
 -- If file doesn't exist, create it.
 function load_config( )
@@ -202,39 +211,53 @@ function load_config( )
   return config
 end
 
+function load_gbans( )
+  local f = io.open('./data/gbans.lua', "r")
+  -- If gbans.lua doesn't exist
+  if not f then
+    print ("Created new gbans file: data/gbans.lua")
+    create_gbans()
+  else
+    f:close()
+  end
+  local gbans = loadfile ("./data/gbans.lua")()
+  return gbans
+end
+
 -- Create a basic config.json file and saves it.
 function create_config( )
   -- A simple config with basic plugins and ourselves as privileged user
   config = {
     enabled_plugins = {
-      "9gag",
-      "eur",
-      "echo",
-      "btc",
-      "get",
-      "giphy",
-      "google",
-      "gps",
-      "help",
+      "bot",
+      "commands",
+      "english_lang",
+      "export_gban",
+      "gban_installer",
+      "giverank",
       "id",
-      "images",
-      "img_google",
-      "location",
-      "media",
+      "moderation",
       "plugins",
-      "channels",
-      "set",
-      "stats",
-      "time",
-      "version",
-      "weather",
-      "xkcd",
-      "youtube" },
+      "settings",
+      "spam",
+      "spanish_lang",
+      "version"
+     },
     sudo_users = {our_id},
+    admin_users = {},
     disabled_channels = {}
   }
   serialize_to_file(config, './data/config.lua')
   print ('saved config into ./data/config.lua')
+end
+
+function create_gbans( )
+  -- A simple config with basic plugins and ourselves as privileged user
+  gbans = {
+    gbans_users = {}
+  }
+  serialize_to_file(gbans, './data/gbans.lua')
+  print ('saved gbans into ./data/gbans.lua')
 end
 
 function on_our_id (id)
